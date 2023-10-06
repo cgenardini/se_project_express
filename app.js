@@ -1,12 +1,10 @@
 const express = require("express");
+
 const mongoose = require("mongoose");
+
 const { PORT = 3001 } = process.env;
-const {
-  handleNonExistentRoute,
-  ServerError,
-  InvalidData,
-  NotFound,
-} = require("./utils/errors");
+const { handleNonExistentRoute } = require("./utils/errors");
+
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 
 const app = express();
@@ -21,10 +19,6 @@ app.use((req, res, next) => {
 
 app.use("/users", require("./routes/user"));
 app.use("/items", require("./routes/clothingItem"));
-
-app.get("/", (req, res) => {
-  res.send(console.log("The port is running"));
-});
 
 app.use(handleNonExistentRoute);
 

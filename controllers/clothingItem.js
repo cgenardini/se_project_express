@@ -4,16 +4,10 @@ const { serverError, invalidData, notFound } = require("../utils/errors");
 module.exports.getClothingItems = (req, res) => {
   ClothingItem.find({})
     .populate("owner")
-    .then((clothingItem) => res.status(200).send(clothingItem))
-    .catch((err) => {
-      console.error(err.name, err.message);
-      if (err.name === "ValidationError") {
-        res.status(invalidData).send(`data not valid: ${err.message}`);
-      }
-      res
-        .status(notFound)
-        .send({ message: `There has been a server error: ${err.message} ` });
-    });
+    .then((clothingItem) => res.send({ data: clothingItem }))
+    .catch(() =>
+      res.status(notFound).send({ message: `There has been a server error` }),
+    );
 };
 
 module.exports.createClothingItem = (req, res) => {
@@ -21,45 +15,38 @@ module.exports.createClothingItem = (req, res) => {
   const owner = req.user._id;
 
   ClothingItem.create({ name, weather, imageUrl, owner })
-    .then((clothingItem) => res.status(200).send(clothingItem))
+    .then((clothingItem) => res.send({ data: clothingItem }))
     .catch((err) => {
-      console.error(err.name, err.message);
       if (err.name === "ValidationError") {
         return res
           .status(invalidData)
-          .send({ message: `this data is not valid: ${err.message}` });
+          .send({ message: `this data is not valid` });
       }
       if (err.name === "CastError") {
         return res.status(invalidData).send({ message: "Invalid ID format" });
       }
-      res
+      return res
         .status(notFound)
-        .send({ message: `There has been a server error: ${err.message} ` });
+        .send({ message: `There has been a server error` });
     });
 };
 
 module.exports.deleteClothingItem = (req, res) => {
-  const itemId = req.params.itemId;
+  const { itemId } = req.params;
 
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
-    .then((clothingItem) => {
-      if (!clothingItem) {
-        return res.status(notFound).send({ message: "Item not found" });
-      }
-      res
-        .status(200)
-        .send({ message: `${clothingItem} was deleted successfully` });
-    })
+    .then(() => res.send({ message: `item was deleted successfully` }))
     .catch((err) => {
-      console.error(err.name, err.message);
-
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(notFound).send({ message: "Document not found" });
+      }
       if (err.name === "CastError") {
         return res.status(invalidData).send({ message: "Invalid ID" });
       }
-      res
+      return res
         .status(notFound)
-        .send({ message: `There has been a server error: ${err.message} ` });
+        .send({ message: `There has been a server error ` });
     });
 };
 
@@ -71,14 +58,13 @@ module.exports.likeClothingItem = (req, res) => {
   )
     .orFail()
     .then((clothingItem) => {
-      res.status(200).send({ data: clothingItem });
+      res.send({ data: clothingItem });
     })
     .catch((err) => {
-      console.error(err.name, err.message);
       if (err.name === "ValidationError") {
         return res
           .status(invalidData)
-          .send({ message: `this data is not valid: ${err.message}` });
+          .send({ message: `this data is not valid` });
       }
       if (err.name === "CastError") {
         return res.status(invalidData).send({ message: "Invalid ID" });
@@ -86,9 +72,9 @@ module.exports.likeClothingItem = (req, res) => {
       if (err.name === "DocumentNotFoundError") {
         return res.status(notFound).send({ message: "Document not found" });
       }
-      res
+      return res
         .status(serverError)
-        .send({ message: `There has been a server error: ${err.message} ` });
+        .send({ message: `There has been a server error` });
     });
 };
 
@@ -100,17 +86,16 @@ module.exports.unlikeClothingItem = (req, res) => {
   )
     .orFail()
     .then((clothingItem) => {
-      res.status(200).send({ data: clothingItem });
+      res.send({ data: clothingItem });
     })
     .catch((err) => {
-      console.error(err.name, err.message);
       if (err.name === "CastError") {
         return res.status(invalidData).send({ message: "Invalid ID" });
       }
       if (err.name === "DocumentNotFoundError") {
         return res.status(notFound).send({ message: "Document not found" });
       }
-      res
+      return res
         .status(serverError)
         .send({ message: `There has been a server error: ${err.message} ` });
     });

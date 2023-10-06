@@ -1,4 +1,4 @@
-function handleNonExistentRoute(req, res, next) {
+function handleNonExistentRoute(req, res) {
   res.status(404).send({
     message: "Requested resource not found",
   });
