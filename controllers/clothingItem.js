@@ -6,7 +6,9 @@ module.exports.getClothingItems = (req, res) => {
     .populate("owner")
     .then((clothingItem) => res.send({ data: clothingItem }))
     .catch(() =>
-      res.status(notFound).send({ message: `There has been a server error` }),
+      res
+        .status(serverError)
+        .send({ message: `There has been a server error` }),
     );
 };
 
@@ -26,7 +28,7 @@ module.exports.createClothingItem = (req, res) => {
         return res.status(invalidData).send({ message: "Invalid ID format" });
       }
       return res
-        .status(notFound)
+        .status(serverError)
         .send({ message: `There has been a server error` });
     });
 };
@@ -45,7 +47,7 @@ module.exports.deleteClothingItem = (req, res) => {
         return res.status(invalidData).send({ message: "Invalid ID" });
       }
       return res
-        .status(notFound)
+        .status(serverError)
         .send({ message: `There has been a server error ` });
     });
 };
