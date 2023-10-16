@@ -1,5 +1,10 @@
 const ClothingItem = require("../models/clothingItem");
-const { serverError, invalidData, notFound } = require("../utils/errors");
+const {
+  serverError,
+  invalidData,
+  notFound,
+  forbiddenError,
+} = require("../utils/errors");
 
 module.exports.getClothingItems = (req, res) => {
   ClothingItem.find({})
@@ -35,10 +40,19 @@ module.exports.createClothingItem = (req, res) => {
 
 module.exports.deleteClothingItem = (req, res) => {
   const { itemId } = req.params;
+  const { _id } = req.user;
 
-  ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findById(itemId)
+
     .orFail()
-    .then(() => res.send({ message: `item was deleted successfully` }))
+    .then((clothingItem) => {
+      if (clothingItem.owner.toString() !== _id.toString()) {
+        return res.status(forbiddenError).send({ message: "permission error" });
+      }
+      return ClothingItem.findByIdAndDelete(itemId);
+    })
+
+    .then(() => res.send({ message: "item was deleted successfully" }))
     .catch((err) => {
       if (err.name === "DocumentNotFoundError") {
         return res.status(notFound).send({ message: "Document not found" });

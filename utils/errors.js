@@ -9,4 +9,7 @@ module.exports = {
   notFound: 404,
   serverError: 500,
   invalidData: 400,
+  forbiddenError: 403,
+  authError: 401,
+  conflictError: 409,
 };

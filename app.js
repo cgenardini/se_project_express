@@ -1,6 +1,10 @@
+require("dotenv").config();
 const express = require("express");
 
 const mongoose = require("mongoose");
+const cors = require("cors");
+
+const { login, createUser } = require("./controllers/user");
 
 const { PORT = 3001 } = process.env;
 const { handleNonExistentRoute } = require("./utils/errors");
@@ -9,13 +13,10 @@ mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: "651ddc868f5eacbdf30787c6",
-  };
-  next();
-});
+app.post("/signin", login);
+app.post("/signup", createUser);
 
 app.use("/users", require("./routes/user"));
 app.use("/items", require("./routes/clothingItem"));
