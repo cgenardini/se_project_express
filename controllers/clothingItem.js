@@ -49,10 +49,10 @@ module.exports.deleteClothingItem = (req, res) => {
       if (clothingItem.owner.toString() !== _id.toString()) {
         return res.status(forbiddenError).send({ message: "permission error" });
       }
-      return ClothingItem.findByIdAndDelete(itemId);
+      return ClothingItem.findByIdAndDelete(itemId).then(() =>
+        res.send({ message: "item was deleted successfully" }),
+      );
     })
-
-    .then(() => res.send({ message: "item was deleted successfully" }))
     .catch((err) => {
       if (err.name === "DocumentNotFoundError") {
         return res.status(notFound).send({ message: "Document not found" });

@@ -27,9 +27,6 @@ module.exports.getUserById = (req, res) => {
     .orFail()
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status(invalidData).send({ message: `data not valid` });
-      }
       if (err.name === "CastError") {
         return res.status(invalidData).send({ message: "Invalid ID" });
       }
@@ -119,9 +116,6 @@ module.exports.getCurrentUser = (req, res) => {
       return res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status(invalidData).send({ message: `data not valid` });
-      }
       if (err.name === "CastError") {
         return res.status(invalidData).send({ message: "Invalid ID" });
       }
@@ -135,9 +129,14 @@ module.exports.getCurrentUser = (req, res) => {
 };
 
 module.exports.editCurrentUser = (req, res) => {
-  const { email, avatar, name, _id } = req.user;
+  const { avatar, name } = req.body;
+  const { _id } = req.user;
 
-  User.findOneAndUpdate({ _id }, { email, avatar, name })
+  User.findOneAndUpdate(
+    { _id },
+    { avatar, name },
+    { new: true, runValidators: true },
+  )
     .then((user) => {
       if (!user) {
         return res.status(notFound).send({ message: "user not found" });
