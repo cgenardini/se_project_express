@@ -8,7 +8,7 @@ const {
 
 module.exports.getClothingItems = (req, res) => {
   ClothingItem.find({})
-    .populate("owner")
+
     .then((clothingItem) => res.send({ data: clothingItem }))
     .catch(() =>
       res
