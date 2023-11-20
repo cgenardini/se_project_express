@@ -29,7 +29,7 @@ app.post("/signin", validateUserLogIn, login);
 app.post("/signup", validateUserInfoBody, createUser);
 
 app.use("/users", require("./routes/user"));
-app.use("/items", auth, require("./routes/clothingItem"));
+app.use("/items", require("./routes/clothingItem"));
 
 app.use(errorLogger);
 
