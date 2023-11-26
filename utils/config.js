@@ -1,4 +1,0 @@
-module.exports = {
-  JWT_SECRET:
-    "70cc17b8a9770a1db19284613013d56ceb8fb9c526e350723060639158b25915",
-};

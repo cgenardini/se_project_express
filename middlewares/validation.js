@@ -47,6 +47,20 @@ module.exports.validateUserInfoBody = celebrate({
   }),
 });
 
+module.exports.validateEditUserInfo = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30).messages({
+      "string.min": 'the minimum length of the "name" field is 2',
+      "string.max": 'the maxium length of the "name" field is 30',
+      "string.empty": 'the "name" field must be filled in',
+    }),
+    avatar: Joi.string().required().custom(validateURL).messages({
+      "string.empty": "the URL image field must be filled in",
+      "string.uri": 'the "imageUrl" field must be a valid url',
+    }),
+  }),
+});
+
 module.exports.validateUserLogIn = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email().messages({

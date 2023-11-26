@@ -5,39 +5,11 @@ const User = require("../models/user");
 
 const BadRequestError = require("../utils/errors/badRequestError");
 const ConflictError = require("../utils/errors/conflictError");
-const ForbiddenError = require("../utils/errors/forbiddenError");
+
 const NotFoundError = require("../utils/errors/notFoundError");
 const UnauthorizedError = require("../utils/errors/unauthorizedError");
 
-const {
-  serverError,
-  invalidData,
-  notFound,
-  authError,
-  conflictError,
-} = require("../utils/errors");
-
-const { JWT_SECRET } = require("../utils/config");
-
-module.exports.getUsers = (req, res, next) => {
-  User.find({})
-    .then((user) => res.send({ data: user }))
-    .catch(next);
-};
-
-module.exports.getUserById = (req, res, next) => {
-  User.findById(req.params.userId)
-    .orFail()
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === "CastError") {
-        next(new BadRequestError("Invalid ID"));
-      }
-      if (err.name === "DocumentNotFoundError") {
-        next(new NotFoundError("Document not found"));
-      } else next(err);
-    });
-};
+const secret = process.env.JWT_SECRET || "secret-key";
 
 module.exports.createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
@@ -81,7 +53,7 @@ module.exports.login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+      const token = jwt.sign({ _id: user._id }, secret, {
         expiresIn: "7d",
       });
       res.send({ token });

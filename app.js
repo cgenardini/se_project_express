@@ -16,8 +16,6 @@ const {
   validateUserLogIn,
 } = require("./middlewares/validation");
 
-const { auth } = require("./middlewares/auth");
-
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 
 const app = express();
@@ -37,9 +35,8 @@ app.post("/signup", validateUserInfoBody, createUser);
 app.use("/users", require("./routes/user"));
 app.use("/items", require("./routes/clothingItem"));
 
-app.use(errorLogger);
-
 app.use(handleNonExistentRoute);
+app.use(errorLogger);
 
 app.use(errors());
 
